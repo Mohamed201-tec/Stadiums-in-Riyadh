@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة الملاعب - تحليل الطريق</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <style>
+        #map {
+            height: 640px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2 style="text-align: center;">خريطة الملاعب بالرياض</h2>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+
+        var map = L.map('map').setView([24.7136, 46.6753], 12);
+
+
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri & contributors'
+        }).addTo(map);
+
+
+
+        var stadiums = [
+            { name: "ملاعب المحترفون", coords: [24.69242, 46.60827] },
+            { name: "ملاعب سبورت", coords: [24.84418, 46.80352] },
+            { name: "اكاديمية السلام لكرة القدم", coords: [24.66591, 46.85494] },
+            { name: "ملعب كرة قدم", coords: [24.71021, 46.62749] },
+            { name: "ملعب رياضي", coords: [24.72158, 46.62243] },
+            { name: "ملعب الصايغ", coords: [24.65537, 46.73174] },
+            { name: "ملاعب المستقبل", coords: [24.86048, 46.79824] },
+            { name: "ملاعب البلديه حي السلام", coords: [24.7131, 46.80948] },
+            { name: "ملاعب المحترفون", coords: [24.69242, 46.60827] },
+            { name: "استاد الامير فيصل بن فهد بن عبد العزيز", coords: [24.66269, 46.73975] },
+            { name: "استاد الملك فهد الدولي", coords: [24.78864, 46.83901] },
+        ];
+
+
+        var markers = [];
+        stadiums.forEach(stadium => {
+            var marker = L.marker(stadium.coords)
+                .addTo(map)
+                .bindPopup(`<b>${stadium.name}</b> <br> <button onclick="calculateRoute(${stadium.coords})">اذهب إلى هنا</button>`);
+            markers.push(marker);
+        });
+
+
+        function calculateRoute(lat, lng) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    var userLocation = [position.coords.latitude, position.coords.longitude];
+
+
+                    L.Routing.control({
+                        waypoints: [
+                            L.latLng(userLocation),
+                            L.latLng(lat, lng)
+                        ],
+                        routeWhileDragging: true
+                    }).addTo(map);
+                }, () => {
+                    alert("لم يتمكن المتصفح من تحديد موقعك!");
+                });
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع!");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
